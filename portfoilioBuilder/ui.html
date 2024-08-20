@@ -44,34 +44,6 @@
         .portfolio-list li:last-child {
             border-bottom: none;
         }
-        input[type="text"], input[type="number"], select {
-            width: 100%;
-            padding: 8px;
-            margin: 10px 0;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #007bff;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .flex-container {
-            display: flex;
-            justify-content: space-between;
-        }
-        .flex-item {
-            flex: 1;
-            margin-right: 15px;
-        }
-        .flex-item:last-child {
-            margin-right: 0;
-        }
     </style>
 </head>
 <body>
@@ -82,102 +54,55 @@
 
     <div class="container">
 
-        <!-- Set Total Portfolio Value -->
+        <!-- Display Market Cap List -->
         <div class="card">
-            <h2>Set Total Portfolio Value</h2>
-            <input type="number" id="totalPortfolioValue" placeholder="Enter total portfolio value (e.g., 100000)">
-            <button onclick="setPortfolioValue()">Set Value</button>
-        </div>
-
-        <!-- Portfolio Creation -->
-        <div class="card">
-            <h2>Create New Portfolio</h2>
-            <input type="text" id="portfolioName" placeholder="Portfolio Name" disabled>
-            <h3>Add Stocks</h3>
-            <div class="flex-container">
-                <div class="flex-item">
-                    <input type="text" id="stockTicker" placeholder="Stock Ticker (e.g., AAPL)" disabled>
-                </div>
-                <div class="flex-item">
-                    <input type="number" id="marketCap" placeholder="Market Cap (e.g., 2500000000)" disabled>
-                </div>
-            </div>
-            <button id="addStockButton" onclick="addStock()" disabled>Add Stock</button>
-            <ul class="portfolio-list" id="portfolioList">
-                <!-- List of added stocks will appear here -->
+            <h2>Top 100 Stocks by Market Cap</h2>
+            <ul class="portfolio-list" id="marketCapList">
+                <!-- List of stocks will be appended here -->
             </ul>
-            <button id="createPortfolioButton" onclick="createPortfolio()" disabled>Create Portfolio</button>
-        </div>
-
-        <!-- Portfolio Analysis -->
-        <div class="card">
-            <h2>Portfolio Analysis</h2>
-            <div class="flex-container">
-                <div class="flex-item">
-                    <h3>Risk Analysis</h3>
-                    <p>Standard Deviation: 12%</p>
-                </div>
-                <div class="flex-item">
-                    <h3>Diversification</h3>
-                    <p>Sectors Covered: 5</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Export/Import -->
-        <div class="card">
-            <h2>Export/Import Portfolio</h2>
-            <button onclick="exportPortfolio()">Export to CSV</button>
-            <button onclick="importPortfolio()">Import from CSV</button>
         </div>
 
     </div>
 
     <script>
-        let portfolioValue = 0;
+        const apiUsername = 'YOUR_API_USERNAME';  // Replace with your Intrinio API Username
+        const apiPassword = 'YOUR_API_PASSWORD';  // Replace with your Intrinio API Password
 
-        function setPortfolioValue() {
-            portfolioValue = parseFloat(document.getElementById('totalPortfolioValue').value);
-            if (portfolioValue > 0) {
-                document.getElementById('portfolioName').disabled = false;
-                document.getElementById('stockTicker').disabled = false;
-                document.getElementById('marketCap').disabled = false;
-                document.getElementById('addStockButton').disabled = false;
-                document.getElementById('createPortfolioButton').disabled = false;
-                alert(`Total Portfolio Value set to $${portfolioValue}`);
-            } else {
-                alert('Please enter a valid total portfolio value.');
+        async function fetchMarketCapData() {
+            const url = 'https://api-v2.intrinio.com/securities?next_page_key&conditions=marketcap>1000000000'; // Adjust the condition to fit your needs
+
+            const headers = new Headers();
+            headers.set('Authorization', 'Basic ' + btoa(apiUsername + ':' + apiPassword));
+
+            try {
+                const response = await fetch(url, { headers: headers });
+                const data = await response.json();
+                return data.data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return [];
             }
         }
 
-        function addStock() {
-            const ticker = document.getElementById('stockTicker').value;
-            const marketCap = parseFloat(document.getElementById('marketCap').value);
-            const portfolioList = document.getElementById('portfolioList');
+        function displayMarketCapList(stocks) {
+            const marketCapList = document.getElementById('marketCapList');
+            marketCapList.innerHTML = '';
 
-            if(ticker && marketCap > 0) {
+            stocks.sort((a, b) => b.market_cap - a.market_cap); // Sort by market cap descending
+
+            stocks.forEach(stock => {
                 const listItem = document.createElement('li');
-                listItem.textContent = `Ticker: ${ticker}, Market Cap: $${marketCap}`;
-                portfolioList.appendChild(listItem);
-            } else {
-                alert('Please enter both stock ticker and a valid market cap.');
-            }
+                listItem.textContent = `${stock.ticker}: $${(stock.market_cap / 1e9).toFixed(2)} Billion`;
+                marketCapList.appendChild(listItem);
+            });
         }
 
-        function createPortfolio() {
-            // Logic to create and save portfolio
-            alert('Portfolio created successfully!');
+        async function loadMarketCapData() {
+            const stocks = await fetchMarketCapData();
+            displayMarketCapList(stocks.slice(0, 100)); // Limit to top 100 stocks
         }
 
-        function exportPortfolio() {
-            // Logic to export portfolio to CSV
-            alert('Portfolio exported to CSV!');
-        }
-
-        function importPortfolio() {
-            // Logic to import portfolio from CSV
-            alert('Portfolio imported from CSV!');
-        }
+        window.onload = loadMarketCapData;
     </script>
 
 </body>
