@@ -44,6 +44,21 @@
         .portfolio-list li:last-child {
             border-bottom: none;
         }
+        #apiKeyForm {
+            margin-bottom: 20px;
+        }
+        #apiKeyInput {
+            padding: 10px;
+            width: calc(100% - 22px);
+            margin-bottom: 10px;
+        }
+        #submitButton {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -54,8 +69,17 @@
 
     <div class="container">
 
-        <!-- Display Market Cap List -->
+        <!-- API Key Input Form -->
         <div class="card">
+            <h2>Enter Your API Key</h2>
+            <form id="apiKeyForm">
+                <input type="text" id="apiKeyInput" placeholder="Enter your Intrinio API Key" required>
+                <button type="submit" id="submitButton">Submit</button>
+            </form>
+        </div>
+
+        <!-- Display Market Cap List -->
+        <div class="card" id="marketCapCard" style="display: none;">
             <h2>Top 100 Stocks by Market Cap</h2>
             <ul class="portfolio-list" id="marketCapList">
                 <!-- List of stocks will be appended here -->
@@ -65,9 +89,13 @@
     </div>
 
     <script>
-        const apiKey = '${{ INTRINO_ACCESS_KEY_ID }}';  // Replace with your Intrinio API key
+        document.getElementById('apiKeyForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent the form from submitting the traditional way
+            const apiKey = document.getElementById('apiKeyInput').value;
+            loadMarketCapData(apiKey);
+        });
 
-        async function fetchMarketCapData() {
+        async function fetchMarketCapData(apiKey) {
             const url = `https://api-v2.intrinio.com/securities?conditions=marketcap>1000000000&api_key=${apiKey}`; 
 
             try {
@@ -91,14 +119,14 @@
                 listItem.textContent = `${stock.ticker}: $${(stock.market_cap / 1e9).toFixed(2)} Billion`;
                 marketCapList.appendChild(listItem);
             });
+
+            document.getElementById('marketCapCard').style.display = 'block';
         }
 
-        async function loadMarketCapData() {
-            const stocks = await fetchMarketCapData();
+        async function loadMarketCapData(apiKey) {
+            const stocks = await fetchMarketCapData(apiKey);
             displayMarketCapList(stocks.slice(0, 100)); // Limit to top 100 stocks
         }
-
-        window.onload = loadMarketCapData;
     </script>
 
 </body>
