@@ -82,43 +82,31 @@
 
     <div class="container">
 
-        <!-- Dashboard Overview -->
+        <!-- Set Total Portfolio Value -->
         <div class="card">
-            <h2>Dashboard Overview</h2>
-            <div class="flex-container">
-                <div class="flex-item">
-                    <h3>Total Portfolio Value</h3>
-                    <p>$100,000</p>
-                </div>
-                <div class="flex-item">
-                    <h3>Number of Stocks</h3>
-                    <p>10</p>
-                </div>
-                <div class="flex-item">
-                    <h3>Overall Performance</h3>
-                    <p>+5%</p>
-                </div>
-            </div>
+            <h2>Set Total Portfolio Value</h2>
+            <input type="number" id="totalPortfolioValue" placeholder="Enter total portfolio value (e.g., 100000)">
+            <button onclick="setPortfolioValue()">Set Value</button>
         </div>
 
         <!-- Portfolio Creation -->
         <div class="card">
             <h2>Create New Portfolio</h2>
-            <input type="text" id="portfolioName" placeholder="Portfolio Name">
+            <input type="text" id="portfolioName" placeholder="Portfolio Name" disabled>
             <h3>Add Stocks</h3>
             <div class="flex-container">
                 <div class="flex-item">
-                    <input type="text" id="stockTicker" placeholder="Stock Ticker (e.g., AAPL)">
+                    <input type="text" id="stockTicker" placeholder="Stock Ticker (e.g., AAPL)" disabled>
                 </div>
                 <div class="flex-item">
-                    <input type="number" id="marketCap" placeholder="Market Cap (e.g., 2500000000)">
+                    <input type="number" id="marketCap" placeholder="Market Cap (e.g., 2500000000)" disabled>
                 </div>
             </div>
-            <button onclick="addStock()">Add Stock</button>
+            <button id="addStockButton" onclick="addStock()" disabled>Add Stock</button>
             <ul class="portfolio-list" id="portfolioList">
                 <!-- List of added stocks will appear here -->
             </ul>
-            <button onclick="createPortfolio()">Create Portfolio</button>
+            <button id="createPortfolioButton" onclick="createPortfolio()" disabled>Create Portfolio</button>
         </div>
 
         <!-- Portfolio Management -->
@@ -157,17 +145,33 @@
     </div>
 
     <script>
+        let portfolioValue = 0;
+
+        function setPortfolioValue() {
+            portfolioValue = parseFloat(document.getElementById('totalPortfolioValue').value);
+            if (portfolioValue > 0) {
+                document.getElementById('portfolioName').disabled = false;
+                document.getElementById('stockTicker').disabled = false;
+                document.getElementById('marketCap').disabled = false;
+                document.getElementById('addStockButton').disabled = false;
+                document.getElementById('createPortfolioButton').disabled = false;
+                alert(`Total Portfolio Value set to $${portfolioValue}`);
+            } else {
+                alert('Please enter a valid total portfolio value.');
+            }
+        }
+
         function addStock() {
             const ticker = document.getElementById('stockTicker').value;
-            const marketCap = document.getElementById('marketCap').value;
+            const marketCap = parseFloat(document.getElementById('marketCap').value);
             const portfolioList = document.getElementById('portfolioList');
 
-            if(ticker && marketCap) {
+            if(ticker && marketCap > 0) {
                 const listItem = document.createElement('li');
                 listItem.textContent = `Ticker: ${ticker}, Market Cap: $${marketCap}`;
                 portfolioList.appendChild(listItem);
             } else {
-                alert('Please enter both stock ticker and market cap');
+                alert('Please enter both stock ticker and a valid market cap.');
             }
         }
 
