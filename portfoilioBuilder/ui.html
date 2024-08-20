@@ -104,16 +104,22 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
+                console.log('Fetched data:', data); // Debugging: Log the fetched data
                 return data.data;
             } catch (error) {
                 console.error('Error fetching data:', error);
-                return [];
+                return null;
             }
         }
 
         function displayMarketCapList(stocks) {
             const marketCapList = document.getElementById('marketCapList');
             marketCapList.innerHTML = '';
+
+            if (!Array.isArray(stocks)) {
+                marketCapList.innerHTML = '<li>Error: Invalid data received.</li>';
+                return;
+            }
 
             stocks.sort((a, b) => b.market_cap - a.market_cap); // Sort by market cap descending
 
@@ -128,7 +134,11 @@
 
         async function loadMarketCapData(apiKey) {
             const stocks = await fetchMarketCapData(apiKey);
-            displayMarketCapList(stocks.slice(0, 100)); // Limit to top 100 stocks
+            if (stocks) {
+                displayMarketCapList(stocks.slice(0, 100)); // Limit to top 100 stocks
+            } else {
+                console.error('No stocks data available.');
+            }
         }
     </script>
 
