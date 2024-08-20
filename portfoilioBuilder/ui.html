@@ -109,17 +109,6 @@
             <button id="createPortfolioButton" onclick="createPortfolio()" disabled>Create Portfolio</button>
         </div>
 
-        <!-- Portfolio Management -->
-        <div class="card">
-            <h2>Manage Portfolios</h2>
-            <select id="selectPortfolio">
-                <option value="1">Portfolio 1</option>
-                <option value="2">Portfolio 2</option>
-                <option value="3">Portfolio 3</option>
-            </select>
-            <button onclick="viewPortfolio()">View Portfolio</button>
-        </div>
-
         <!-- Portfolio Analysis -->
         <div class="card">
             <h2>Portfolio Analysis</h2>
@@ -178,11 +167,6 @@
         function createPortfolio() {
             // Logic to create and save portfolio
             alert('Portfolio created successfully!');
-        }
-
-        function viewPortfolio() {
-            // Logic to view selected portfolio
-            alert('Viewing portfolio...');
         }
 
         function exportPortfolio() {
