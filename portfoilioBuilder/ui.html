@@ -40,6 +40,9 @@
         .portfolio-list li {
             padding: 10px;
             border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .portfolio-list li:last-child {
             border-bottom: none;
@@ -60,6 +63,15 @@
         }
         button:hover {
             background-color: #0056b3;
+        }
+        .delete-btn {
+            background-color: #ff4c4c;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #ff0000;
         }
         .flex-container {
             display: flex;
@@ -135,6 +147,7 @@
 
     <script>
         let portfolioValue = 0;
+        let stockList = [];
 
         function setPortfolioValue() {
             portfolioValue = parseFloat(document.getElementById('totalPortfolioValue').value);
@@ -153,15 +166,38 @@
         function addStock() {
             const ticker = document.getElementById('stockTicker').value;
             const marketCap = parseFloat(document.getElementById('marketCap').value);
-            const portfolioList = document.getElementById('portfolioList');
 
             if(ticker && marketCap > 0) {
-                const listItem = document.createElement('li');
-                listItem.textContent = `Ticker: ${ticker}, Market Cap: $${marketCap}`;
-                portfolioList.appendChild(listItem);
+                const stock = { ticker, marketCap };
+                stockList.push(stock);
+                renderPortfolioList();
             } else {
                 alert('Please enter both stock ticker and a valid market cap.');
             }
+        }
+
+        function deleteStock(index) {
+            stockList.splice(index, 1);
+            renderPortfolioList();
+        }
+
+        function renderPortfolioList() {
+            const portfolioList = document.getElementById('portfolioList');
+            portfolioList.innerHTML = ''; // Clear current list
+
+            stockList.forEach((stock, index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `Ticker: ${stock.ticker}, Market Cap: $${stock.marketCap.toLocaleString()}`;
+                
+                // Create Delete Button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.onclick = () => deleteStock(index);
+
+                listItem.appendChild(deleteBtn);
+                portfolioList.appendChild(listItem);
+            });
         }
 
         function createPortfolio() {
