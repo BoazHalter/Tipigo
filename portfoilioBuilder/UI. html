@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Builder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        input[type="number"] {
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Portfolio Builder</h1>
+
+    <h3>Total Budget</h3>
+    <label for="totalBudget">Enter Total Budget: </label>
+    <input type="number" id="totalBudget" value="600000">
+
+    <h3>Sectors</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Sector</th>
+                <th>Weight</th>
+                <th>Budget Per Sector</th>
+                <th>Positions</th>
+                <th>Average Position Size</th>
+                <th>Min Position Size</th>
+                <th>Max Position Size</th>
+                <th>Total Positions Budget</th>
+            </tr>
+        </thead>
+        <tbody id="sectorTable">
+            <!-- Rows will be generated here by JavaScript -->
+        </tbody>
+    </table>
+
+    <button onclick="calculate()">Calculate</button>
+
+    <script>
+        const sectors = [
+            {name: "Information Technology", weight: 0.29, positions: 8},
+            {name: "Healthcare", weight: 0.12, positions: 3},
+            {name: "Financials", weight: 0.125, positions: 2}
+            // Add more sectors as needed
+        ];
+
+        function populateTable() {
+            const tableBody = document.getElementById("sectorTable");
+            sectors.forEach(sector => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${sector.name}</td>
+                    <td>${sector.weight}</td>
+                    <td><span id="budget-${sector.name}"></span></td>
+                    <td>${sector.positions}</td>
+                    <td><span id="avgPosition-${sector.name}"></span></td>
+                    <td><span id="minPosition-${sector.name}"></span></td>
+                    <td><span id="maxPosition-${sector.name}"></span></td>
+                    <td><span id="totalBudget-${sector.name}"></span></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function calculate() {
+            const totalBudget = parseFloat(document.getElementById("totalBudget").value);
+
+            sectors.forEach(sector => {
+                const budgetPerSector = totalBudget * sector.weight;
+                const avgPositionSize = budgetPerSector / sector.positions;
+                const minPositionSize = avgPositionSize / 2;
+                const maxPositionSize = avgPositionSize * 2;
+                const totalPositionsBudget = avgPositionSize * sector.positions;
+
+                document.getElementById(`budget-${sector.name}`).innerText = budgetPerSector.toFixed(2);
+                document.getElementById(`avgPosition-${sector.name}`).innerText = avgPositionSize.toFixed(2);
+                document.getElementById(`minPosition-${sector.name}`).innerText = minPositionSize.toFixed(2);
+                document.getElementById(`maxPosition-${sector.name}`).innerText = maxPositionSize.toFixed(2);
+                document.getElementById(`totalBudget-${sector.name}`).innerText = totalPositionsBudget.toFixed(2);
+            });
+        }
+
+        window.onload = populateTable;
+    </script>
+</body>
+</html>
